@@ -1,0 +1,19 @@
+#To delete package and file
+
+- hosts: all 
+  remote_user: ec2-user 
+  become: yes 
+  tasks: 
+
+     - name: delete the latest version of Apache 
+       yum: 
+          name: httpd 
+          state: absent 
+
+     - name: Ansible delete multiple file example 
+       file: 
+           path: "{{ item }}" 
+           state: absent 
+       with_items: 
+               - /home/ec2-user/index.html 
+               - /var/www/html/index.html  

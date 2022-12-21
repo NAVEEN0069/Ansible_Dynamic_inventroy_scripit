@@ -1,0 +1,15 @@
+#To terminate instance and using loop
+
+- name: Terminate instances 
+  hosts: localhost 
+  connection: local 
+  tasks: 
+
+    - name: Terminate instances that were previously launched 
+      ec2: 
+        state: absent 
+        region: us-west-1 
+        instance_ids: "{{item}}" 
+      loop: 
+         - i-0308250bc35824815 
+         - i-0eb317e619320dfc5 
