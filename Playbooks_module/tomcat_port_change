@@ -1,0 +1,57 @@
+#To change port number you need to send the server.xml file to master.
+#you need to change server.xml file to server.xml.j2 file.
+#you need to restart the tomcat because you changed the port and to see the result.
+#Then declare a variable in playbook
+
+
+- hosts: all
+  remote_user: ec2-user
+  become: yes
+  vars:
+      tomcat_port: 7070
+  tasks:
+     - name: updating a package
+       yum:
+         name: '*'
+         state: present
+
+     - name: installing java
+       yum: 
+         name: java-1.8.0-openjdk
+         state: present
+  
+     - name: download tomcat from the offcial site
+       get_url:
+           url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.70/bin/apache-tomcat-9.0.70.tar.gz   
+           dest: /usr/local
+           mode: '0777'
+
+     - name: unarchive the tomcat file
+       unarchive:
+           src: /usr/local/apache-tomcat-9.0.70.tar.gz   
+           dest: /usr/local
+           remote_src: yes
+           mode: 'o777'
+
+     - name: port change
+       template:
+           src: server.xml.j2
+           dest: /usr/local/apache-tomcat-9.0.70/conf/server.xml
+
+     - name: stop tomcat
+       shell: nohup /usr/local/apache-tomcat-9.0.70/bin/shutdown.sh &
+
+     - name: start tomcat
+       shell: nohup /usr/local/apache-tomcat-9.0.70/bin/startup.sh &
+
+     - name: download war file
+       get_url:
+           url: https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war
+           dest: /home/ec2-user/
+
+     - name: move file to webapps
+       copy:
+           src: /home/ec2-user/sample.war
+           dest: /usr/local/apache-tomcat-9.0.70/webapps/sample.war
+           remote_src: yes
+
