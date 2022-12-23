@@ -1,0 +1,26 @@
+---
+# tasks file for httpd
+ 
+- name: install httpd
+  yum: 
+      name: httpd
+      state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: httpd start
+  service:
+      name: httpd
+      state: started
+
+- name: move j2 file
+  template:
+     src: httpd.conf.j2
+     dest: /etc/httpd/conf/httpd.conf
+  notify:
+  - restart httpd
+
+- name: move file to httpd
+  copy:
+     src: index.html
+     dest: /var/www/html/index.html
+

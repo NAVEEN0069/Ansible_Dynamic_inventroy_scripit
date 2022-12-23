@@ -1,0 +1,55 @@
+- hosts: all
+  remote_user: ec2-user
+  become: yes
+  vars:
+      nginx_port: 90
+  tasks:
+
+     - name: install httpd
+       yum: 
+          name: httpd
+          state: present
+       when: ansible_facts['os_family'] == "RedHat"
+
+     - name: httpd start
+       service:
+          name: httpd
+          state: started
+  
+     - name: move file to httpd
+       copy:
+          src: index.html
+          dest: /var/www/html/index.html
+       notify:
+       - restart httpd
+
+     - name: nginx installing
+       yum:
+          name: nginx
+          state: present
+
+     - name: nginx start
+       service:
+          name: nginx
+          state: started
+         
+     - name: port changing and move jinja file
+       template:
+          src: default.conf.j2
+          dest: /etc/nginx/conf.d/default.conf 
+       notify: 
+       - restart nginx
+
+  handlers:
+     - name: restart nginx
+       service:
+          name: nginx
+          state: restarted
+         
+     - name: restart httpd
+       service:
+          name: httpd
+          state: restarted
+
+      
+
