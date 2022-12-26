@@ -1,0 +1,32 @@
+- name: Install httpd on Red Hat systems
+  yum:
+     name: httpd
+     state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install nginx on Debian systems
+  apt:
+     name: nginx
+     state: present
+  when: ansible_os_family == "Debian"
+
+- name: move j2 file
+  template:
+     src: httpd.conf.j2
+     dest: /etc/httpd/conf/httpd.conf
+  when: ansible_os_family == "RedHat"
+  notify:
+  - httpd start
+        
+- name: port changing and move jinja file
+  template:
+     src: default.j2
+     dest: /etc/nginx/sites-enabled/default
+  when: ansible_os_family == "Debian"
+  notify:
+  - nginx start
+
+- name: move file to httpd
+  copy:
+     src: index.html
+     dest: /var/www/html/index.html

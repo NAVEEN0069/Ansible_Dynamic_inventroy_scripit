@@ -1,0 +1,10 @@
+- name: httpd start
+  service:
+      name: httpd
+      state: started
+
+- name: nginx start
+  service:
+      name: nginx
+      state: started
+

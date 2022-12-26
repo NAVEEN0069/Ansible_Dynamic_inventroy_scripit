@@ -1,0 +1,5 @@
+---
+# vars file for web
+
+httpd_port: 90
+nginx_port: 100
